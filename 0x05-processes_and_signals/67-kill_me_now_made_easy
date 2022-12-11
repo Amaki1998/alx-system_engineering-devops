@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 # kills To infinity and beyond indefinitely.
 
-pkill -f 7-highlander --signal 9
+pkill -f 4-to_infinity_and_beyond
