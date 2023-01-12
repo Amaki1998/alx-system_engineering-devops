@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# Shows current dir content without number and dash.
-
-LIST="$(ls)"
-for i in $LIST; do
-	echo "$i" | cut -d '-' -f 2
+# Iterates through files in dir and parses them
+for file in *; do
+	echo "$file" | cut -d'-' -f2-
 done

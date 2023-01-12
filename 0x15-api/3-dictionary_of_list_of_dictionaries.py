@@ -1,29 +1,37 @@
 #!/usr/bin/python3
-# using this REST API, for all employees ID,
-# returns information about users TODO list progress
-# to export data in the JSON format.
+'''Reads todo list from api for id passed and turns into json file'''
+
 import json
-from requests import get
-from sys import argv
+import requests
+import sys
+
+base_url = 'https://jsonplaceholder.typicode.com/'
 
 
-def api_to_data():
+def do_request():
+    '''Performs request'''
+    response = requests.get(base_url + 'users/')
+    if response.status_code != 200:
+        return print('Error: status_code:', response.status_code)
+    users = response.json()
+
+    response = requests.get(base_url + 'todos/')
+    if response.status_code != 200:
+        return print('Error: status_code:', response.status_code)
+    todos = response.json()
+
     data = {}
-    url = "https://jsonplaceholder.typicode.com/"
-    users = get(url + "users").json()
     for user in users:
-        user_id = user.get("id")
-        task_list = []
-        tasks = get(url + "todos?userId={}".format(user_id)).json()
-        for task in tasks:
-            tdict = {}
-            tdict["username"] = user.get("username")
-            tdict["task"] = task.get("title")
-            tdict["completed"] = task.get("completed")
-            task_list.append(tdict)
-        data[user_id] = task_list
-    with open("todo_all_employees.json", 'w', newline='') as json_file:
-        json.dump(data, json_file)
+        user_todos = [todo for todo in todos
+                      if todo.get('userId') == user.get('id')]
+        user_todos = [{'username': user.get('username'),
+                       'task': todo.get('title'),
+                       'completed': todo.get('completed')}
+                      for todo in user_todos]
+        data[str(user.get('id'))] = user_todos
 
-if __name__ == "__main__":
-    api_to_data()
+    with open('todo_all_employees.json', 'w') as file:
+        json.dump(data, file)
+
+if __name__ == '__main__':
+    do_request()

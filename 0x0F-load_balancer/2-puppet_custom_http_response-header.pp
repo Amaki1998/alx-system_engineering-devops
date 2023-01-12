@@ -1,8 +1,18 @@
-# Install Nginx web server with custom header response
-exec { 'Nginx install with custom header response':
-command => 'sudo apt-get update -y && sudo apt-get install nginx -y && 
-            header="\\\tadd_header X-Served-By $HOSTNAME;\n" && 
-            sudo sed -i "38i $header" /etc/nginx/sites-available/default && 
-            sudo service nginx restart',
-provider => shell,
+# Installs nginx n stuff
+exec { '/usr/bin/env apt-get -y update' : }
+-> package { 'nginx':
+  ensure => installed,
 }
+-> file { '/var/www/html/index.html' :
+  content => 'Holberton School!',
+}
+-> file_line { 'add header' :
+  ensure => present,
+  path   => '/etc/nginx/sites-available/default',
+  line   => "\tadd_header X-Served-By ${hostname};",
+  after  => 'server_name _;',
+}
+-> service { 'nginx':
+  ensure => running,
+}
+

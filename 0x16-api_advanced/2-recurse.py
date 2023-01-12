@@ -1,25 +1,28 @@
 #!/usr/bin/python3
-"""
-Recursive function that queries the Reddit API and returns a
-list containing the titles of all hot articles for a given subreddit.
-"""
-from requests import get
+'''Get ALL hot posts'''
+import pprint
+import requests
+
+BASE_URL = 'http://reddit.com/r/{}/hot.json'
 
 
-def recurse(subreddit, hot_list=[], next=""):
-    """
-    Hot posts by subreddit in a recursive way
-    """
-    headers = {"user-agent": "kyeeh"}
-    url = "https://api.reddit.com/r/{}/hot?after={}".format(subreddit, next)
-    try:
-        req_data = get(url, headers=headers, allow_redirects=False).json()
-        hot_posts = req_data["data"]["children"]
-        for post in hot_posts:
-            hot_list.append(post['data']['title'])
-        next = req_data['data']['after']
-        if next:
-            recurse(subreddit, hot_list, next)
-        return (hot_list)
-    except Exception:
-        return (None)
+def recurse(subreddit, hot_list=[], after=None):
+    '''Get ALL hot posts'''
+    headers = {'User-agent': 'Unix:0-subs:v1'}
+    params = {'limit': 100}
+    if isinstance(after, str):
+        if after != "STOP":
+            params['after'] = after
+        else:
+            return hot_list
+    response = requests.get(BASE_URL.format(subreddit),
+                            headers=headers, params=params)
+    if response.status_code != 200:
+        return None
+    data = response.json().get('data', {})
+    after = data.get('after', 'STOP')
+    if not after:
+        after = "STOP"
+    hot_list = hot_list + [post.get('data', {}).get('title')
+                           for post in data.get('children', [])]
+    return recurse(subreddit, hot_list, after)

@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
-# Bash script to Install nginx web server
-
-sudo apt-get update -y
-sudo apt-get install nginx -y
-echo 'Holberton School' | sudo tee /var/www/html/index.nginx-debian.html
-sudo service nginx start
-rdt="location /redirect_me {\\nrewrite ^(.*)$ https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;\\n}"
-sudo sed -i "30i $rdt" /etc/nginx/sites-available/default
-sudo service nginx restart
+# installs nginx
+apt-get -y update
+apt-get -y install nginx
+echo "Holberton School" > /var/www/html/index.nginx-debian.html
+sed -i "/server_name _;/ a\\\trewrite ^/redirect_me http://www.holbertonschool.com permanent;" /etc/nginx/sites-available/default
+service nginx start

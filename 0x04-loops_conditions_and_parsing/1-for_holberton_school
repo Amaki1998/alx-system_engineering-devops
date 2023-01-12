@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# This script is displaying "Holberton School" 10 times
-
-for i in {0..9}; do
-	echo "$i" >> /tmp/tmp.txt
-	echo "Holberton School"
+# Prints string 10 times via for loop
+for _ in $(seq 1 10); do
+	echo Holberton School
 done

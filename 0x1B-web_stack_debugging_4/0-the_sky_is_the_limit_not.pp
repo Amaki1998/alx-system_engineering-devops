@@ -1,7 +1,3 @@
-# Puppet manifest to fix nginx worker processes.
-exec { 'workers':
-    command => '/bin/sed -i "s/15/1500/g" /etc/default/nginx'
-}
--> exec {'restart web server':
-  command => '/usr/sbin/service nginx restart'
-}
+# Puppet script
+exec { '/usr/bin/env sed -i s/15/1000/ /etc/default/nginx': }
+-> exec { '/usr/bin/env service nginx restart': }

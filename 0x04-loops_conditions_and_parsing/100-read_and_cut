@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
-# displays the content of the file /etc/passwd.
-
-while read line; do
-	USERNAME=$(echo "$line" | cut -d: -f1)
-	USER_ID=$(echo "$line" | cut -d: -f3)
-	HOME=$(echo "$line" | cut -d: -f6)
-	echo "$USERNAME:$USER_ID:$HOME"
-done < "/etc/passwd"
+# Displays contents of /etc/passwd with read n cut
+exec 3< /etc/passwd
+while read -u 3; do
+	echo "$REPLY" | cut -d':' -f1,3,6
+done

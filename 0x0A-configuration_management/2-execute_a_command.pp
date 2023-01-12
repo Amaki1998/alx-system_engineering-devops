@@ -1,5 +1,3 @@
-# Using Puppet to create a manifest that kills a process
-exec { 'killmenow':
-  command  => 'pkill killmenow',
-  provider => 'shell'
+# Kills a process
+exec { '/usr/bin/env pkill -9 killmenow':
 }

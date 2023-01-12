@@ -1,25 +1,46 @@
 #!/usr/bin/python3
-# using this REST API, for a given employee ID,
-# returns information about his/her TODO list progress
-# to export data in the JSON format.
+'''Reads todo list from api for id passed and turns into json file'''
+
 import json
-from requests import get
-from sys import argv
+import requests
+import sys
+
+base_url = 'https://jsonplaceholder.typicode.com/'
 
 
-def api_to_json(user_id):
-    task_list = []
-    url = "https://jsonplaceholder.typicode.com/"
-    user = get(url + "users/{}".format(user_id)).json()
-    tasks = get(url + "todos?userId={}".format(user_id)).json()
-    for task in tasks:
-        tdict = {}
-        tdict["task"] = task.get("title")
-        tdict["completed"] = task.get("completed")
-        tdict["username"] = user.get("username")
-        task_list.append(tdict)
-    with open("{}.json".format(user_id), 'w', newline='') as json_file:
-        json.dump({argv[1]: task_list}, json_file)
+def do_request():
+    '''Performs request'''
 
-if __name__ == "__main__":
-    api_to_json(int(argv[1]))
+    if len(sys.argv) < 2:
+        return print('USAGE:', __file__, '<employee id>')
+    eid = sys.argv[1]
+    try:
+        _eid = int(sys.argv[1])
+    except ValueError:
+        return print('Employee id must be an integer')
+
+    response = requests.get(base_url + 'users/' + eid)
+    if response.status_code == 404:
+        return print('User id not found')
+    elif response.status_code != 200:
+        return print('Error: status_code:', response.status_code)
+    user = response.json()
+
+    response = requests.get(base_url + 'todos/')
+    if response.status_code != 200:
+        return print('Error: status_code:', response.status_code)
+    todos = response.json()
+    user_todos = [todo for todo in todos
+                  if todo.get('userId') == user.get('id')]
+    completed = [todo for todo in user_todos if todo.get('completed')]
+
+    user_todos = [{'task': todo.get('title'),
+                   'completed': todo.get('completed'),
+                   'username': user.get('username')}
+                  for todo in user_todos]
+    data = {eid: user_todos}
+    with open(eid + '.json', 'w') as file:
+        json.dump(data, file)
+
+if __name__ == '__main__':
+    do_request()

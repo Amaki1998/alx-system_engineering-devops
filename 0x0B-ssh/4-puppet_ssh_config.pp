@@ -1,6 +1,12 @@
-# SSH client configuration
-exec { 'echo -e "IdentityFile ~/.ssh/holberton\n" >> /etc/ssh/ssh_config':
-  provider => shell,
-  path    => '/etc/ssh/ssh_config',
-  command => 'echo -e "PasswordAuthentication no\n" >> /etc/ssh/ssh_config'
+# Turns off password authentication and uses holberton key
+file_line { 'Turn off passwd auth':
+  ensure => 'present',
+  path   => '/etc/ssh/ssh_config',
+  line   => '    PasswordAuthentication no',
+}
+
+file_line { 'Declare identity file':
+  ensure => 'present',
+  path   => '/etc/ssh/ssh_config',
+  line   => '    IdentityFile ~/.ssh/holberton',
 }
